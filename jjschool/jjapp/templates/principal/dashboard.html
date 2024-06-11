@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Principal Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px 0;
+            background-color: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #555;
+        }
+
+        .btn-logout {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #e74c3c;
+        }
+
+        .btn-logout:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-back {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: transparent;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-back:hover {
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a class="btn-back" href="{% url 'home_page' %}">Back</a>
+        <h1>Principal Dashboard</h1>
+        <a class="btn btn-logout" href="{% url 'logout' %}">Logout</a>
+    </header>
+
+    <div class="container">
+        <a class="btn" href="{% url 'manage_notifications' %}">Manage and Post Notifications</a>
+        <a class="btn" href="{% url 'list_students' %}">Manage Students</a>
+        <a class="btn" href="{% url 'add_teacher' %}">Add Teacher</a>
+    </div>
+</body>
+</html>
