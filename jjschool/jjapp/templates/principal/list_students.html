@@ -95,8 +95,8 @@
                         <td>{{ student.remaining_fee }}</td>
                         <td>{{ student.attendance_percentage }}</td>
                         <td class="actions">
-                            <a href="{% url 'edit_student' student.id %}" class="btn">Edit</a>
-                            <a href="{% url 'soft_delete_student' student.id %}" class="btn">Delete</a>
+                            <a href="{% url 'edit_student' student.user.id %}" class="btn">Edit</a>
+                            <a href="{% url 'soft_delete_student' student.user.id %}" class="btn">Delete</a>
                         </td>
                     </tr>
                 {% endfor %}

@@ -9,6 +9,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
         }
 
         header {
@@ -37,6 +38,7 @@
             text-decoration: none;
             border-radius: 3px;
             cursor: pointer;
+            text-align: center;
         }
 
         .btn:hover {
@@ -80,6 +82,16 @@
         <a class="btn" href="{% url 'manage_notifications' %}">Manage and Post Notifications</a>
         <a class="btn" href="{% url 'list_students' %}">Manage Students</a>
         <a class="btn" href="{% url 'add_teacher' %}">Add Teacher</a>
+
+    </div>
+
+    <div class="container">
+        <h2>Record Attendance</h2>
+            {% csrf_token %}
+            <!-- Assuming you have a form instance named 'form' passed from the view -->
+            {{ form.as_p }}
+            <button type="submit" class="btn">Submit</button>
+        </form>
     </div>
 </body>
 </html>

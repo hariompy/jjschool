@@ -94,7 +94,7 @@
                         <td>{{ student.remaining_fee }}</td>
                         <td>{{ student.attendance_percentage }}</td>
                         <td class="actions">
-                            <a href="{% url 'restore_student' student.id %}" class="btn">Restore</a>
+                            <a href="{% url 'restore_student' student.user.id %}" class="btn">Restore</a>
                         </td>
                     </tr>
                 {% endfor %}

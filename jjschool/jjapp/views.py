@@ -1,81 +1,39 @@
-from django.shortcuts import render, redirect
+
+from django.shortcuts import render, redirect ,get_object_or_404
+from django.contrib.auth import login, authenticate, logout
+from .forms import *
+from .decorators import *
 from django.contrib.auth.decorators import login_required
-from .models import Notification  # Import the Notification model
 from django.shortcuts import render, redirect
-from .models import Principal
-from django.contrib.auth.hashers import check_password
-
-def principal_login(request):
-    hardcoded_username = 'hyy'
-    hardcoded_password = 'hyy'
-
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
-        if username == hardcoded_username and password == hardcoded_password:
-            # Hardcoded credentials match, simulate authentication
-            principal = Principal.objects.get_or_create(username=username, defaults={'name': 'Your Name', 'email': 'your_email@example.com'})[0]
-            request.session['principal_id'] = principal.id
-            return redirect('principal_dashboard')
-        else:
-            error_message = 'Invalid username or password'
-            return render(request, 'principal/login.html', {'error_message': error_message})
-    else:
-        return render(request, 'principal/login.html')
+from .models import *
+from django.contrib.auth.decorators import user_passes_test
 
 
-from django.shortcuts import render, redirect
-from .models import Notification, Principal
-from django.contrib.auth.hashers import check_password
-# views.py
+
+
 def home_page(request):
     notifications = Notification.objects.all().order_by('-created_at')
     information = "Welcome to Our School's Website! Here you'll find all the latest updates and announcements."
     return render(request, 'home.html', {'notifications': notifications, 'information': information})
 
-def principal_dashboard(request):
-    if 'principal_id' in request.session:
-        notifications = Notification.objects.all()
-        return render(request, 'principal/dashboard.html', {'notifications': notifications})
-    else:
+
+
+def logout_view(request):
+    user_role = request.user.role if request.user.is_authenticated else None
+    logout(request)
+
+    if user_role == 'student':
+        return redirect('student_login')
+    elif user_role == 'teacher':
+        return redirect('teacher_login')
+    elif user_role == 'principal':
         return redirect('principal_login')
-
-from django.shortcuts import render, redirect
-from .models import Notification
-
-def manage_notifications(request):
-    if 'principal_id' in request.session:
-        if request.method == 'POST':
-            title = request.POST.get('title')
-            content = request.POST.get('content')
-            Notification.objects.create(title=title, content=content)
-            return redirect('manage_notifications')
-        notifications = Notification.objects.all()
-        return render(request, 'principal/manage_notifications.html', {'notifications': notifications})
     else:
-        return redirect('principal_login')
+        return redirect('home_page')
+    
+    
 
 
-def edit_notification(request, notification_id):
-    if 'principal_id' in request.session:
-        notification = Notification.objects.get(id=notification_id)
-        if request.method == 'POST':
-            notification.title = request.POST.get('title')
-            notification.content = request.POST.get('content')
-            notification.save()
-            return redirect('manage_notifications')
-        return render(request, 'principal/edit_notification.html', {'notification': notification})
-    else:
-        return redirect('principal_login')
-
-def delete_notification(request, notification_id):
-    if 'principal_id' in request.session:
-        notification = Notification.objects.get(id=notification_id)
-        notification.delete()
-        return redirect('manage_notifications')
-    else:
-        return redirect('principal_login')
 
 def teachers_page(request):
     return render(request, 'teachers_page.html')
@@ -85,171 +43,221 @@ def manager_page(request):
 
 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Student
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Student
+
+
+
+
+
+
+
+
+
+
+#principal thinks 
+
+def principal_login(request):
+    if request.method == 'POST':
+        form = PrincipalForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('principal_dashboard')
+
+    else:
+        form = PrincipalForm()
+    return render(request, 'principal/login.html', {'form': form})
+
+
+
+
+@user_passes_test(is_principal, login_url='principal_login')
+def principal_dashboard(request):
+    notifications = Notification.objects.all()
+    return render(request, 'principal/dashboard.html', {'notifications': notifications})
+
+
+
+
+@user_passes_test(is_principal, login_url='principal_login')
+def manage_notifications(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        Notification.objects.create(title=title, content=content)
+        return redirect('manage_notifications')
+    notifications = Notification.objects.all()
+    return render(request, 'principal/manage_notifications.html', {'notifications': notifications})
+
+
+@user_passes_test(is_principal, login_url='principal_login')
+def edit_notification(request, notification_id):
+    notification = Notification.objects.get(id=notification_id)
+    if request.method == 'POST':
+        notification.title = request.POST.get('title')
+        notification.content = request.POST.get('content')
+        notification.save()
+        return redirect('manage_notifications')
+    return render(request, 'principal/edit_notification.html', {'notification': notification})
+
+
+@user_passes_test(is_principal, login_url='principal_login')
+def delete_notification(request, notification_id):
+    notification = Notification.objects.get(id=notification_id)
+    notification.delete()
+    return redirect('manage_notifications')
+
+@user_passes_test(is_principal, login_url='principal_login')
+def edit_notification(request, notification_id):
+    notification = Notification.objects.get(id=notification_id)
+    if request.method == 'POST':
+        notification.title = request.POST.get('title')
+        notification.content = request.POST.get('content')
+        notification.save()
+        return redirect('manage_notifications')
+    return render(request, 'principal/edit_notification.html', {'notification': notification})
+
+
+
 
 def list_students(request):
-    if 'principal_id' in request.session:
-        students = Student.objects.filter(is_deleted=False)
-        return render(request, 'principal/list_students.html', {'students': students})
-    else:
-        return redirect('principal_login')
+    students = Student.objects.filter(is_deleted=False)
+    return render(request, 'principal/list_students.html', {'students': students})
 
+
+@user_passes_test(is_principal, login_url='principal_login')
 def deleted_students(request):
-    if 'principal_id' in request.session:
         students = Student.objects.filter(is_deleted=True)
         return render(request, 'principal/deleted_students.html', {'students': students})
-    else:
-        return redirect('principal_login')
+
 
 def soft_delete_student(request, student_id):
-    if 'principal_id' in request.session:
-        student = get_object_or_404(Student, id=student_id)
-        student.is_deleted = True
-        student.save()
-        return redirect('list_students')
-    else:
-        return redirect('principal_login')
+    student = get_object_or_404(Student, user__id=student_id)
+    student.is_deleted = True
+    student.save()
+    return redirect('list_students')
 
+
+@user_passes_test(is_principal, login_url='principal_login')
 def restore_student(request, student_id):
-    if 'principal_id' in request.session:
-        student = get_object_or_404(Student, id=student_id)
-        student.is_deleted = False
-        student.save()
-        return redirect('deleted_students')
-    else:
-        return redirect('principal_login')
+    student = get_object_or_404(Student, user_id=student_id)
+    student.is_deleted = False
+    student.save()
+    return redirect('deleted_students')
 
 
 def add_student(request):
-    if 'principal_id' in request.session:
-        if request.method == 'POST':
-            first_name = request.POST.get('first_name')
-            last_name = request.POST.get('last_name')
-            date_of_birth = request.POST.get('date_of_birth')
-            admission_date = request.POST.get('admission_date')
-            grade = request.POST.get('grade')
-            performance = request.POST.get('performance')
-            attendance_records = request.POST.get('attendance_records')
-            disciplinary_actions = request.POST.get('disciplinary_actions')
-            total_fee = request.POST.get('total_fee')
-            remaining_fee = request.POST.get('remaining_fee')
-            attendance_percentage = request.POST.get('attendance_percentage')
-            Student.objects.create(
-                first_name=first_name,
-                last_name=last_name,
-                date_of_birth=date_of_birth,
-                admission_date=admission_date,
-                grade=grade,
-                performance=performance,
-                attendance_records=attendance_records,
-                disciplinary_actions=disciplinary_actions,
-                total_fee=total_fee,
-                remaining_fee=remaining_fee,
-                attendance_percentage=attendance_percentage
-            )
-            return redirect('list_students')
-        return render(request, 'principal/add_student.html')
+    if request.method == "POST":
+        form = StudentForm(request.POST)
+        if form.is_valid():
+            user = request.user  
+            student = form.save(commit=False)
+            student.user = user  
+            student.save()  
+            return redirect('principal_dashboard')
     else:
-        return redirect('principal_login')
+        form = StudentForm()
+    return render(request, 'principal/add_student.html', {'form': form})
 
+
+
+@user_passes_test(is_principal, login_url='principal_login')
 def edit_student(request, student_id):
-    if 'principal_id' in request.session:
-        student = get_object_or_404(Student, id=student_id)
-        if request.method == 'POST':
-            student.first_name = request.POST.get('first_name')
-            student.last_name = request.POST.get('last_name')
-            student.date_of_birth = request.POST.get('date_of_birth')
-            student.admission_date = request.POST.get('admission_date')
-            student.grade = request.POST.get('grade')
-            student.performance = request.POST.get('performance')
-            student.attendance_records = request.POST.get('attendance_records')
-            student.disciplinary_actions = request.POST.get('disciplinary_actions')
-            student.total_fee = request.POST.get('total_fee')
-            student.remaining_fee = request.POST.get('remaining_fee')
-            student.attendance_percentage = request.POST.get('attendance_percentage')
-            student.save()
-            return redirect('list_students')
-        return render(request, 'principal/edit_student.html', {'student': student})
+    student_user = get_object_or_404(CustomUser, id=student_id)
+    student = get_object_or_404(Student, user=student_user)
+    
+    if request.method == 'POST':
+        form = StudentForm(request.POST, instance=student)
+        if form.is_valid():
+            form.save()
+            return redirect('list_students') 
     else:
-        return redirect('principal_login')
+        form = StudentForm(instance=student)
+    
+    return render(request, 'principal/edit_student.html', {'form': form, 'student': student})
 
+
+@login_required
+@user_passes_test(is_principal, login_url='principal_login')
 def delete_student(request, student_id):
-    if 'principal_id' in request.session:
-        student = get_object_or_404(Student, id=student_id)
+    # Fetch the CustomUser instance associated with the student_id
+    student_user = get_object_or_404(CustomUser, id=student_id)
+    # Fetch the Student instance related to the CustomUser instance
+    student = get_object_or_404(Student, user=student_user)
+    
+    if request.method == 'POST':
         student.delete()
         return redirect('list_students')
+    
+    return render(request, 'principal/delete_student.html', {'student': student})
+
+
+# views.py
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth import login, authenticate
+from .forms import CustomUserForm, TeacherForm
+from .models import CustomUser, Teacher
+
+@user_passes_test(is_principal, login_url='principal_login')
+def add_teacher(request):
+    if request.method == 'POST':
+        user_form = CustomUserForm(request.POST)
+        teacher_form = TeacherForm(request.POST)
+        
+        if user_form.is_valid() and teacher_form.is_valid():
+            user = user_form.save(commit=False)
+            user.role = 'teacher'
+            user.set_password(user_form.cleaned_data['password'])  # Set the password correctly
+            user.save()
+            
+            teacher = teacher_form.save(commit=False)
+            teacher.user = user
+            teacher.save()
+            
+            return redirect('principal_dashboard')  # Redirect to principal dashboard after successful addition
+        else:
+            error = "Please correct the errors below."
+            return render(request, 'principal/add_teacher.html', {'user_form': user_form, 'teacher_form': teacher_form, 'error': error})
     else:
-        return redirect('principal_login')
+        user_form = CustomUserForm()
+        teacher_form = TeacherForm()
+    return render(request, 'principal/add_teacher.html', {'user_form': user_form, 'teacher_form': teacher_form})
 
 
+
+
+
+
+
+# views.py
+# views.py
 from django.shortcuts import render, redirect
-from django.contrib.auth import logout as auth_logout
-
-def logout_view(request):
-    if 'principal_id' in request.session:
-        del request.session['principal_id']
-    return redirect('home_page')
-
-
-
-from django.shortcuts import render, redirect
-from .models import Teacher
-from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth import login, authenticate
+from .forms import TeacherLogForm
 
 def teacher_login(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        
-        try:
-            teacher = Teacher.objects.get(username=username)
-            if check_password(password, teacher.password):
-                request.session['teacher_id'] = teacher.id
-                return redirect('teachers_dashboard')  # Assuming you have a dashboard view for teachers
+        form = TeacherLogForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None and user.role == 'teacher':  # Ensure the user is a teacher
+                login(request, user)
+                return redirect('teachers_dashboard')
             else:
-                error_message = 'Invalid username or password'
-        except Teacher.DoesNotExist:
-            error_message = 'Invalid username or password'
-        
-        return render(request, 'teacher/login.html', {'error_message': error_message})
+                form.add_error(None, 'Invalid username or password.')
     else:
-        return render(request, 'teacher/login.html')
+        form = TeacherLogForm()
+    return render(request, 'teacher/login.html', {'form': form})
+
+
 
 def teachers_dashboard(request):
-    if 'teacher_id' in request.session:
-        # Fetch any required data for teachers dashboard here
-        return render(request, 'teacher/dashboard.html')
-    else:
-        return redirect('teacher_login')
+    return render(request, 'teacher/dashboard.html')
 
 
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.hashers import make_password
-from .models import Teacher
 
-def add_teacher(request):
-    if 'principal_id' in request.session:
-        if request.method == 'POST':
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            name = request.POST.get('name')
-            email = request.POST.get('email')
-            if username and password and name and email:
-                Teacher.objects.create(
-                    username=username,
-                    password=make_password(password),
-                    name=name,
-                    email=email
-                )
-                return redirect('principal_dashboard')
-            else:
-                error_message = 'All fields are required.'
-                return render(request, 'principal/add_teacher.html', {'error_message': error_message})
-        else:
-            return render(request, 'principal/add_teacher.html')
-    else:
-        return redirect('principal_login')

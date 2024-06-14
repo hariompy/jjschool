@@ -1,3 +1,4 @@
+<!-- templates/principal/add_student.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,104 +6,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Student</title>
     <style>
+        /* Add your CSS styles here */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #fff;
             margin: 0;
             padding: 0;
         }
 
         header {
-            background-color: #333;
-            color: #fff;
+            background-color: #000000;
+            width: 100%;
+            color: #ffffff;
             padding: 10px;
             text-align: center;
         }
 
-        .container {
-            max-width: 600px;
+        form {
+            width: 95%;
             margin: 20px auto;
             padding: 20px;
             background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         label {
+            display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
 
         input, textarea {
+            width: 95%;
+            padding: 10px;
             margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            width: 100%;
-            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
 
-        button {
-            padding: 10px;
-            background-color: #333;
-            color: #fff;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
+        .bookmarkBtn {
+        width: 100px;
+        height: 40px;
+        border-radius: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.349);
+        background-color: rgb(12, 12, 12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition-duration: 0.3s;
+        overflow: hidden;
         }
 
-        button:hover {
-            background-color: #555;
+        .IconContainer {
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(to bottom, rgb(255, 255, 255), rgb(255, 255, 255));
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        z-index: 2;
+        transition-duration: 0.3s;
         }
+
+        .icon {
+        border-radius: 1px;
+        }
+
+        .text {
+        height: 100%;
+        width: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        z-index: 1;
+        transition-duration: 0.3s;
+        font-size: 1.04em;
+        }
+
+        .bookmarkBtn:hover .IconContainer {
+        width: 90px;
+        transition-duration: 0.3s;
+        }
+
+        .bookmarkBtn:hover .text {
+        transform: translate(10px);
+        width: 0;
+        font-size: 0;
+        transition-duration: 0.3s;
+        }
+
+        .bookmarkBtn:active {
+        transform: scale(0.95);
+        transition-duration: 0.3s;
+        }
+
     </style>
 </head>
 <body>
     <header>
         <h1>Add Student</h1>
     </header>
-    <div class="container">
-        <form method="POST">
-            {% csrf_token %}
-            <label for="first_name">First Name:</label>
-            <input type="text" id="first_name" name="first_name" required>
-
-            <label for="last_name">Last Name:</label>
-            <input type="text" id="last_name" name="last_name" required>
-
-            <label for="date_of_birth">Date of Birth:</label>
-            <input type="date" id="date_of_birth" name="date_of_birth" required>
-
-            <label for="admission_date">Admission Date:</label>
-            <input type="date" id="admission_date" name="admission_date" required>
-
-            <label for="grade">Grade:</label>
-            <input type="text" id="grade" name="grade" required>
-
-            <label for="performance">Performance:</label>
-            <textarea id="performance" name="performance"></textarea>
-
-            <label for="attendance_records">Attendance Records:</label>
-            <textarea id="attendance_records" name="attendance_records"></textarea>
-
-            <label for="disciplinary_actions">Disciplinary Actions:</label>
-            <textarea id="disciplinary_actions" name="disciplinary_actions"></textarea>
-
-            <label for="total_fee">Total Fee:</label>
-            <input type="number" id="total_fee" name="total_fee" step="0.01" required>
-
-            <label for="remaining_fee">Remaining Fee:</label>
-            <input type="number" id="remaining_fee" name="remaining_fee" step="0.01" required>
-
-            <label for="attendance_percentage">Attendance Percentage:</label>
-            <input type="number" id="attendance_percentage" name="attendance_percentage" step="0.01" required>
-
-            <button type="submit">Add Student</button>
-        </form>
-    </div>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <label for="user_id">User ID:</label>
+        <input type="text" id="user_id" name="user_id">
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        <button class="bookmarkBtn">
+            <span class="IconContainer">
+              <svg viewBox="0 0 384 512" height="0.9em" class="icon">
+                <path
+                  d="M0 48V487.7C0 501.1 10.9 512 24.3 512c5 0 9.9-1.5 14-4.4L192 400 345.7 507.6c4.1 2.9 9 4.4 14 4.4c13.4 0 24.3-10.9 24.3-24.3V48c0-26.5-21.5-48-48-48H48C21.5 0 0 21.5 0 48z"
+                ></path>
+              </svg>
+            </span>
+            <p class="text">Save</p>
+          </button>
+    </form>
 </body>
 </html>
