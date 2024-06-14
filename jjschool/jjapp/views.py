@@ -194,11 +194,6 @@ def delete_student(request, student_id):
     return render(request, 'principal/delete_student.html', {'student': student})
 
 
-# views.py
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth import login, authenticate
-from .forms import CustomUserForm, TeacherForm
-from .models import CustomUser, Teacher
 
 @user_passes_test(is_principal, login_url='principal_login')
 def add_teacher(request):
@@ -231,11 +226,6 @@ def add_teacher(request):
 
 
 
-# views.py
-# views.py
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
-from .forms import TeacherLogForm
 
 def teacher_login(request):
     if request.method == 'POST':
@@ -254,9 +244,10 @@ def teacher_login(request):
     return render(request, 'teacher/login.html', {'form': form})
 
 
-
+@user_passes_test(is_teacher, login_url='teacher_login')
 def teachers_dashboard(request):
     return render(request, 'teacher/dashboard.html')
+
 
 
 

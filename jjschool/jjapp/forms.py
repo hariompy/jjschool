@@ -6,7 +6,7 @@ from django import forms
 from .models import Teacher, CustomUser
 
 class CustomUserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
+    # password = forms.CharField(widget=forms.PasswordInput)
 
     class Meta:
         model = CustomUser
