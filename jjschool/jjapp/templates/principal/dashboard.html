@@ -4,94 +4,155 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Principal Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
         }
 
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            position: relative;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 5px;
+        .navbar {
+            background-color: #212121;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 10px 0;
-            background-color: #333;
+        .brand-logo {
+            margin-left: 20px;
             color: #fff;
-            text-decoration: none;
-            border-radius: 3px;
-            cursor: pointer;
-            text-align: center;
+        }
+
+        .container {
+            margin-top: 40px;
+        }
+
+        .card {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        .card-content {
+            padding: 24px;
+        }
+
+        .card-title {
+            margin-bottom: 20px;
+            color: #212121;
+        }
+
+        .btn {
+            margin-right: 10px;
+            background-color: #212121;
+            color: #fff;
         }
 
         .btn:hover {
-            background-color: #555;
+            background-color: #424242;
         }
 
-        .btn-logout {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #e74c3c;
+        .attendance-form {
+            margin-top: 40px;
         }
 
-        .btn-logout:hover {
-            background-color: #c0392b;
+        .slider {
+            margin-top: 40px;
         }
 
-        .btn-back {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: transparent;
-            color: #fff;
-            border: none;
-            cursor: pointer;
+        .slider .slides li img {
+            height: 400px;
+            object-fit: cover;
         }
 
-        .btn-back:hover {
-            color: #ccc;
+        .slider .indicators .indicator-item {
+            background-color: #212121;
         }
     </style>
 </head>
 <body>
-    <header>
-        <a class="btn-back" href="{% url 'home_page' %}">Back</a>
-        <h1>Principal Dashboard</h1>
-        <a class="btn btn-logout" href="{% url 'logout' %}">Logout</a>
-    </header>
+    <nav class="navbar">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">Principal Dashboard</a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
 
     <div class="container">
-        <a class="btn" href="{% url 'manage_notifications' %}">Manage and Post Notifications</a>
-        <a class="btn" href="{% url 'list_students' %}">Manage Students</a>
-        <a class="btn" href="{% url 'add_teacher' %}">Add Teacher</a>
+        <div class="row">
+            <div class="col s12 m6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Actions</span>
+                        <a class="waves-effect waves-light btn" href="{% url 'manage_notifications' %}">
+                            <i class="material-icons left">notifications</i>
+                            Manage Notifications
+                        </a>
+                        <a class="waves-effect waves-light btn" href="{% url 'list_students' %}">
+                            <i class="material-icons left">people</i>
+                            Manage Students
+                        </a>
+                        <a class="waves-effect waves-light btn" href="{% url 'add_teacher' %}">
+                            <i class="material-icons left">person_add</i>
+                            Add Teacher
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col s12 m6">
+                <div class="card attendance-form">
+                    <div class="card-content">
+                        <span class="card-title">Record Attendance</span>
+                        <form method="post">
+                            {% csrf_token %}
+                            <!-- Assuming you have a form instance named 'form' passed from the view -->
+                            {{ form.as_p }}
+                            <button type="submit" class="waves-effect waves-light btn">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div class="slider">
+            <ul class="slides">
+                <li>
+                    <img src="https://via.placeholder.com/800x400?text=Slide+1">
+                    <div class="caption center-align">
+                        <h3>Slide 1 Heading</h3>
+                        <h5 class="light grey-text text-lighten-3">Slide 1 Caption</h5>
+                    </div>
+                </li>
+                <li>
+                    <img src="https://via.placeholder.com/800x400?text=Slide+2">
+                    <div class="caption left-align">
+                        <h3>Slide 2 Heading</h3>
+                        <h5 class="light grey-text text-lighten-3">Slide 2 Caption</h5>
+                    </div>
+                </li>
+                <li>
+                    <img src="https://via.placeholder.com/800x400?text=Slide+3">
+                    <div class="caption right-align">
+                        <h3>Slide 3 Heading</h3>
+                        <h5 class="light grey-text text-lighten-3">Slide 3 Caption</h5>
+                    </div>
+                </li>
+            </ul>
+        </div>
     </div>
 
-    <div class="container">
-        <h2>Record Attendance</h2>
-            {% csrf_token %}
-            <!-- Assuming you have a form instance named 'form' passed from the view -->
-            {{ form.as_p }}
-            <button type="submit" class="btn">Submit</button>
-        </form>
-    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('.slider');
+            var instances = M.Slider.init(elems, {
+                indicators: true,
+                height: 400,
+                transition: 500,
+                interval: 6000
+            });
+        });
+    </script>
 </body>
 </html>

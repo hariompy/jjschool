@@ -28,10 +28,7 @@ class PrincipalForm(AuthenticationForm):
     class Meta:
         fields = ('username', 'password')
 
-# forms.py
-# forms.py
-from django.contrib.auth.forms import AuthenticationForm
-from .models import CustomUser
+
 
 class TeacherLogForm(AuthenticationForm):
     class Meta:
@@ -40,13 +37,6 @@ class TeacherLogForm(AuthenticationForm):
 
 
 
-# forms.py
-from django import forms
-from .models import Teacher
-
-# forms.py
-from django import forms
-from .models import Teacher
 
 class TeacherForm(forms.ModelForm):
     class Meta:

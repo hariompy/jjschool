@@ -11,6 +11,9 @@ from django.contrib.auth.decorators import user_passes_test
 
 
 
+# def test(request):
+#     return render(request, 'index.html')
+
 def home_page(request):
     notifications = Notification.objects.all().order_by('-created_at')
     information = "Welcome to Our School's Website! Here you'll find all the latest updates and announcements."
@@ -247,6 +250,33 @@ def teacher_login(request):
 @user_passes_test(is_teacher, login_url='teacher_login')
 def teachers_dashboard(request):
     return render(request, 'teacher/dashboard.html')
+
+
+
+def student_login(request):
+    if request.method == 'POST':
+        form = StudentForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None and user.role == 'teacher':  # Ensure the user is a teacher
+                login(request, user)
+                return redirect('student_dashboard')
+            else:
+                form.add_error(None, 'Invalid username or password.')
+    else:
+        form = TeacherLogForm()
+    return render(request, 'student/login.html', {'form': form})
+
+
+from django.http import HttpResponse
+
+
+@user_passes_test(is_student, login_url='teacher_login')
+def student_dashboard(request):
+    return HttpResponse("hey this is student dashboard")
+
 
 
 
